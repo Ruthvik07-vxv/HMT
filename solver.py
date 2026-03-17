@@ -262,6 +262,10 @@ def main(nx = 40, ny = 40, tTop = 100, tBottom = 0, tLeft = 0, tRight = 0, toler
         print("Errors")
         print(f"max error: {np.max(errorActual)}")
         print(f"Average error: {np.average(errorActual)}")
+        np.savetxt("errorMap.csv", np.flipud(errorActual), delimiter=",")
+        saveTemperatureGrid(errorActual, "errorMap.txt")
+        PlotTemperature(errorActual)
+        print("Error plot values is saved as errorMap.csv and errorMap.txt respectively")
         
         print(f"Enter the values of x (< {nx}) and y (< {ny}) to compare the values")
         verify = 1
@@ -284,7 +288,7 @@ def main(nx = 40, ny = 40, tTop = 100, tBottom = 0, tLeft = 0, tRight = 0, toler
         verify = int(input("Enter any value to continue, and -1 to terminate the solution: "))
         if verify == -1 :
                 sys.exit()
-        else :
+        else : 
             continue
 
 Lx = float(input("Enter the length of the specimen: "))
