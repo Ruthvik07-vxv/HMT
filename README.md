@@ -1,220 +1,93 @@
-# 2D Heat Conduction Solver (Finite Difference Method)
+# 2D Finite Difference Heat Conduction Solver
 
-A Python implementation of **2‑D steady state heat conduction solvers**
-using the **Finite Difference Method (FDM)**.
+A high-performance, modular Python library for solving 2D steady-state heat conduction problems using the **Finite Difference Method (FDM)**. 
 
-This repository contains **two independent solvers** designed to solve
-different heat transfer problems on a rectangular plate.\
-Both solvers use an **iterative Gauss--Seidel style method** to converge
-the temperature field to a specified tolerance.
+Moving beyond simple scripts, this repository features a fully modular architecture with multiple iterative numerical schemes, parallel solver racing, and support for complex boundary conditions including convective heat transfer.
 
-------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
-# Overview
+## Overview
 
-The code numerically solves the **2‑D steady heat conduction equation**.
+This engine numerically solves the 2D steady heat conduction equation on a structured Cartesian grid. 
 
-### Without heat generation
+### Pure Conduction (Laplace Equation)
+$$\nabla^2 T = 0$$
 
-∇²T = 0
+### Internal Heat Generation (Poisson Equation)
+$$\nabla^2 T + \frac{q}{k} = 0$$
 
-### With internal heat generation
+Where $T$ is temperature, $q$ is volumetric heat generation, and $k$ is thermal conductivity.
 
-∇²T + q/k = 0
+--------------------------------------------------------------------------------
 
-Where:
+##  Repository Structure
 
-  Symbol   Meaning
-  -------- ---------------------------------
-  T        Temperature
-  q        Heat generation per unit volume
-  k        Thermal conductivity
+The codebase is organized into a modular pipeline, separating grid generation, boundary logic, numerical solvers, and data export.
 
-The solver works on a **rectangular grid** and iteratively updates node
-temperatures until convergence.
+* `main.py`: The core execution script handling user inputs and parallel processing.
+* `mesh.py`: Initializes the computational grid and Dirichlet fixed-temperature nodes.
+* `boundary.py`: Manages Neumann boundary conditions (convective layers) and calculates boundary states.
+* `postprocess.py`: Handles Matplotlib visualization (contours, isotherms) and data export.
+* `solver/`
+    * `analytical.py`: Computes the exact Fourier series solution for validation.
+    * `gauss_seidel.py`: Gauss-Seidel algorithm (includes internal heat generation support).
+    * `jacobi.py`: Standard Jacobi iterative scheme.
+    * `sor.py`: Successive Over-Relaxation (SOR) with a custom relaxation factor.
+    * `utils.py`: Helper functions for error calculations and Biot number extraction.
 
-------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
-# Repository Structure
+##  Key Features
 
-    .
-    ├── solver.py
-    ├── solver2.py
-    └── README.md
+* **Parallel Solver Racing:** Uses Python's `multiprocessing` to run Jacobi, Gauss-Seidel, and SOR simultaneously, automatically identifying and returning the fastest converged solution.
+* **Advanced Boundary Conditions:** Supports standard fixed temperatures (Dirichlet) as well as convective boundary layers (Neumann) utilizing the Biot number ($Bi$).
+* **Analytical Validation:** Automatically compares the numerical solution against the exact 2D analytical Fourier series (for pure conduction cases) to calculate maximum absolute error.
+* **Robust Post-Processing:** Automatically generates and saves high-quality `.png` contour maps, isotherm plots, and exports the raw temperature/error fields to `.csv` and `.txt`.
 
-## solver.py
+---
 
-Main FDM solver with the following features:
+##  Numerical Schemes
 
--   Dirichlet boundary conditions
--   Optional convection boundary conditions
--   Analytical solution comparison (Fourier series)
--   Error calculation
--   CSV and TXT export of results
--   Temperature contour plots
--   Isotherm plots
+| Solver | Characteristics | Best Use Case |
+| :--- | :--- | :--- |
+| **Jacobi** | Uses old temperature values for all spatial updates. | Stable baseline testing, easy to parallelize natively. |
+| **Gauss-Seidel** | Uses the most recently computed spatial values. | Faster convergence than Jacobi with lower memory overhead. |
+| **SOR** | Applies a relaxation factor ($\omega$) to accelerate the GS update. | High-resolution grids where rapid convergence is required. |
 
-## solver2.py
+---
 
-Extended solver with additional capabilities:
+##  Usage
 
--   Internal heat generation
--   Arbitrary fixed temperature nodes inside the mesh
--   Separate solvers for:
-    -   No heat generation
-    -   Heat generation
--   Custom geometry support
--   Convergence monitoring
--   Visualization of results
+To launch the solver pipeline, run the main orchestrator:
 
-------------------------------------------------------------------------
+```bash
+python main.py 
 
-# Features
+or 
 
-## Numerical Solver
+```bash
+python3 main.py
 
--   2‑D Finite Difference discretization
--   Gauss‑Seidel iterative method
--   Convergence based on maximum error tolerance
+** Interactive Prompts: **
+The terminal will guide you through setting up the simulation domain:
+* Domain dimensions (Length and Width)
+* Grid resolution (Number of nodes in X and Y)
+* Wall temperatures (Top, Bottom, Left, Right)
+* Convergence tolerance (e.g., 1e-5)
+* Convection parameters (Heat transfer coefficient, ambient temp, thermal conductivity)
+* Solver selection (Choose a specific solver or race them all)
 
-## Boundary Conditions
+All visualizations and data exports will be automatically generated and saved in a local `results/` folder.
 
-Supported boundary conditions include:
+---
 
--   Fixed temperature (Dirichlet)
--   Convective boundary conditions
--   Internal fixed temperature nodes
+## 🔧 Dependencies
 
-## Heat Generation
+* `numpy`
+* `matplotlib`
 
-The second solver supports volumetric heat generation.
+Install them via pip:
+```bash
+pip install numpy matplotlib
 
-## Analytical Solution Comparison
 
-For pure conduction cases, the solver compares numerical results against
-the **analytical Fourier series solution**.
-
-Reported metrics include:
-
--   Maximum error
--   Average error
--   Node‑by‑node comparison
-
-## Visualization
-
-The solver automatically generates:
-
--   Temperature contour plots
--   Isotherm lines
--   Combined visualization
-
-Plots are saved as:
-
--   Temperature Contours.png
--   Temperature Isotherms.png
--   Combined Plot.png
-
-## Data Export
-
-Temperature fields can be exported to:
-
--   ActualTemperature.txt
--   TemperatureField.csv
--   TheoreticalT.txt
--   TheoreticalT.csv
-
-These files can be analyzed using tools like **Excel, MATLAB, or
-Python**.
-
-------------------------------------------------------------------------
-
-# How the Solver Works
-
-1.  A mesh is created with specified boundary temperatures.
-
-2.  Interior nodes are updated using the finite difference formulation:
-
-    T(i,j) = 1/4 \[T(i+1,j) + T(i-1,j) + T(i,j+1) + T(i,j-1)\]
-
-3.  Iterations continue until:
-
-    max(\|T_new − T_old\|) \< tolerance
-
-4.  Results are visualized and exported.
-
-------------------------------------------------------------------------
-
-# Requirements
-
-Install required Python libraries:
-
-    pip install numpy matplotlib
-
-------------------------------------------------------------------------
-
-# Running the Solvers
-
-## Run solver.py
-
-    python solver.py
-
-You will be prompted for:
-
--   Plate dimensions
--   Grid resolution
--   Boundary temperatures
--   Convergence tolerance
--   Optional convection parameters
-
-------------------------------------------------------------------------
-
-## Run solver2.py
-
-    python solver2.py
-
-Choose the case:
-
-    1 → Steady conduction (no heat generation)
-    2 → Conduction with heat generation
-
-Then provide:
-
--   Grid resolution
--   Boundary temperatures
--   Plate dimensions
--   Heat generation rate (if applicable)
--   Thermal conductivity
--   Convergence tolerance
-
-Optional internal fixed temperature nodes can also be specified.
-
-------------------------------------------------------------------------
-
-# Numerical Method
-
-The solver uses:
-
--   Finite Difference Method (FDM)
--   Gauss‑Seidel iteration
--   Structured rectangular grid
-
-The approach is simple, stable, and suitable for **educational heat
-transfer simulations**.
-
-------------------------------------------------------------------------
-
-# Possible Future Improvements
-
-Potential extensions include:
-
--   Successive Over‑Relaxation (SOR) for faster convergence
--   Transient heat conduction solver
--   Non‑uniform grids
--   Neumann boundary conditions
--   Interactive GUI visualization
-
-------------------------------------------------------------------------
-
-# Author
-
-Developed as part of **Heat and Mass Transfer numerical simulations**.
