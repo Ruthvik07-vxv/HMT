@@ -95,6 +95,10 @@ def main() :
     Bi_x, Bi_y = ut.biot_number(h, k, length, width, tMesh)
     Bi = (Bi_x + Bi_y) / 2 
 
+    folder_name = "results"
+    if not os.path.exists(folder_name) :
+        os.makedirs(folder_name)
+
     print()
     print("Select the solver to use: ")
     print("1. Jacobi")
@@ -122,21 +126,36 @@ def main() :
         with mp.Pool(processes=3) as pool :
             results = pool.starmap(run_solver, [(method, tMesh, fixed, nx, ny, tolerance, Bi, t_Inf, omega, neumann_top, neumann_bottom, neumann_left, neumann_right) for method in methods])
         for method, result, duration in results :
-            print(f"{method.capitalize()} solver completed in {duration:.2f} seconds.")
+            print(f"{method.capitalize()} solver completed in {duration:.4f} seconds.")
             if method == "jacobi" :
                 tMesh_jacobi = result
+                file_path_jacobi_1 = os.path.join(folder_name, "jacobi_temperature_contour.txt")
+                file_path_jacobi_2 = os.path.join(folder_name, "jacobi_temperature_contour.csv")
+                pp.saveTemperatureGrid(tMesh_jacobi, file_path_jacobi_1)
+                pp.save_CSV(tMesh_jacobi, file_path_jacobi_2)
             elif method == "gauss-seidel" :
                 tMesh_gs = result
+                file_path_gs_1 = os.path.join(folder_name, "gauss-seidel_temperature_contour.txt")
+                file_path_gs_2 = os.path.join(folder_name, "gauss-seidel_temperature_contour.csv")
+                pp.saveTemperatureGrid(tMesh_gs, file_path_gs_1)
+                pp.save_CSV(tMesh_gs, file_path_gs_2)
             elif method == "sor" :
                 tMesh_sor = result
+                file_path_sor_1 = os.path.join(folder_name, "sor_temperature_contour.txt")
+                file_path_sor_2 = os.path.join(folder_name, "sor_temperature_contour.csv")
+                pp.saveTemperatureGrid(tMesh_sor, file_path_sor_1)
+                pp.save_CSV(tMesh_sor, file_path_sor_2)
+
+        best = min(results, key=lambda x: x[2])
+        print(f"The fastest solver is: {best[0].capitalize()} with a time of {best[2]:.4f} seconds.")
+        tMesh = best[1] 
+
+
     
     else :
         print("Wrong input! Try again")
         return main()
-
-    folder_name = "results"
-    if not os.path.exists(folder_name) :
-        os.makedirs(folder_name)
+    
     file_path = os.path.join(folder_name, "temperature_contour.png")
     pp.plot_temperature_contours(tMesh, title="Temperature Contour", save_path=file_path)
 
