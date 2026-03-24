@@ -1,14 +1,12 @@
 # 2D Finite Difference Heat Conduction Solver
 
-A high-performance, modular Python library for solving 2D steady-state heat conduction problems using the **Finite Difference Method (FDM)**. 
-
-Moving beyond simple scripts, this repository features a fully modular architecture with multiple iterative numerical schemes, parallel solver racing, and support for complex boundary conditions including convective heat transfer.
+This project solves 2D steady-state heat conduction problems using the Finite Difference Method (FDM). It includes different numerical methods, supports common boundary conditions, and provides graphical output of the results.
 
 ---
 
 ##  Overview
 
-This engine numerically solves the 2D steady heat conduction equation on a structured Cartesian grid. 
+The solver computes the temperature distribution on a rectangular plate by numerically solving the steady heat conduction equation.
 
 ### Pure Conduction (Laplace Equation)
 ∇²T = 0
@@ -16,13 +14,30 @@ This engine numerically solves the 2D steady heat conduction equation on a struc
 ### Internal Heat Generation (Poisson Equation)
 ∇²T + q/k = 0
 
-Where T is temperature, q is volumetric heat generation, and k is thermal conductivity.
+Where:
+* T = Temperature
+* q = Heat generation per unit volume
+* k = Thermal conductivity
+
+The solution is obtained by iteratively updating grid values until the specified convergence tolerance is met.
 
 ---
 
 ##  Repository Structure
 
 The codebase is organized into a modular pipeline, separating grid generation, boundary logic, numerical solvers, and data export.
+
+.
+├── main.py
+├── mesh.py
+├── boundary.py
+├── postprocess.py
+└── solver/
+    ├── analytical.py
+    ├── gauss_seidel.py
+    ├── jacobi.py
+    ├── sor.py
+    └── utils.py
 
 * `main.py`: The core execution script handling user inputs and parallel processing.
 * `mesh.py`: Initializes the computational grid and Dirichlet fixed-temperature nodes.
@@ -58,7 +73,7 @@ The codebase is organized into a modular pipeline, separating grid generation, b
 
 ##  Usage
 
-To launch the solver pipeline, run the main orchestrator:
+To launch the solver pipeline, run the main execution file:
 
     python main.py
 
@@ -77,11 +92,26 @@ All visualizations and data exports will be automatically generated and saved in
 
 ---
 
-##  Dependencies
+##  Requirements and Dependencies
 
 * `numpy`
 * `matplotlib`
 
-Install them via pip:
+Install the required Python libraries using pip:
 
     pip install numpy matplotlib
+
+---
+
+## Future Work
+
+* Improve convergence tracking.
+* Extend the solver to transient (unsteady) conduction.
+* Add support for more complex boundary conditions.
+
+---
+
+## Author
+**Ruthvik**  
+
+Mechanical Engineering Student
