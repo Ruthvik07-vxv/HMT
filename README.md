@@ -4,21 +4,21 @@ A high-performance, modular Python library for solving 2D steady-state heat cond
 
 Moving beyond simple scripts, this repository features a fully modular architecture with multiple iterative numerical schemes, parallel solver racing, and support for complex boundary conditions including convective heat transfer.
 
---------------------------------------------------------------------------------
+---
 
-## Overview
+##  Overview
 
 This engine numerically solves the 2D steady heat conduction equation on a structured Cartesian grid. 
 
 ### Pure Conduction (Laplace Equation)
-$$\nabla^2 T = 0$$
+∇²T = 0
 
 ### Internal Heat Generation (Poisson Equation)
-$$\nabla^2 T + \frac{q}{k} = 0$$
+∇²T + q/k = 0
 
-Where $T$ is temperature, $q$ is volumetric heat generation, and $k$ is thermal conductivity.
+Where T is temperature, q is volumetric heat generation, and k is thermal conductivity.
 
---------------------------------------------------------------------------------
+---
 
 ##  Repository Structure
 
@@ -35,13 +35,13 @@ The codebase is organized into a modular pipeline, separating grid generation, b
     * `sor.py`: Successive Over-Relaxation (SOR) with a custom relaxation factor.
     * `utils.py`: Helper functions for error calculations and Biot number extraction.
 
---------------------------------------------------------------------------------
+---
 
 ##  Key Features
 
 * **Parallel Solver Racing:** Uses Python's `multiprocessing` to run Jacobi, Gauss-Seidel, and SOR simultaneously, automatically identifying and returning the fastest converged solution.
-* **Advanced Boundary Conditions:** Supports standard fixed temperatures (Dirichlet) as well as convective boundary layers (Neumann) utilizing the Biot number ($Bi$).
-* **Analytical Validation:** Automatically compares the numerical solution against the exact 2D analytical Fourier series (for pure conduction cases) to calculate maximum absolute error.
+* **Advanced Boundary Conditions:** Supports standard fixed temperatures (Dirichlet) as well as convective boundary layers (Neumann) utilizing the Biot number (Bi).
+* **Analytical Validation:** Automatically compares the numerical solution against the exact 2D analytical Fourier series.
 * **Robust Post-Processing:** Automatically generates and saves high-quality `.png` contour maps, isotherm plots, and exports the raw temperature/error fields to `.csv` and `.txt`.
 
 ---
@@ -52,7 +52,7 @@ The codebase is organized into a modular pipeline, separating grid generation, b
 | :--- | :--- | :--- |
 | **Jacobi** | Uses old temperature values for all spatial updates. | Stable baseline testing, easy to parallelize natively. |
 | **Gauss-Seidel** | Uses the most recently computed spatial values. | Faster convergence than Jacobi with lower memory overhead. |
-| **SOR** | Applies a relaxation factor ($\omega$) to accelerate the GS update. | High-resolution grids where rapid convergence is required. |
+| **SOR** | Applies a relaxation factor (ω) to accelerate the GS update. | High-resolution grids where rapid convergence is required. |
 
 ---
 
@@ -60,15 +60,11 @@ The codebase is organized into a modular pipeline, separating grid generation, b
 
 To launch the solver pipeline, run the main orchestrator:
 
-```bash
-python main.py 
+    python main.py
 
-or 
+*(You can also use python3 main.py depending on your environment)*
 
-```bash
-python3 main.py
-
-** Interactive Prompts: **
+**Interactive Prompts:**
 The terminal will guide you through setting up the simulation domain:
 * Domain dimensions (Length and Width)
 * Grid resolution (Number of nodes in X and Y)
@@ -81,13 +77,11 @@ All visualizations and data exports will be automatically generated and saved in
 
 ---
 
-## 🔧 Dependencies
+##  Dependencies
 
 * `numpy`
 * `matplotlib`
 
 Install them via pip:
-```bash
-pip install numpy matplotlib
 
-
+    pip install numpy matplotlib
